@@ -35,7 +35,17 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "esModuleInterop": true,
     "skipLibCheck": true,
-  }
+    "esModuleInterop": true,
+  },
+
+
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "generated/prisma"
+  ]
 }
