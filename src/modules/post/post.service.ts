@@ -1,4 +1,6 @@
-import { Post } from "../../../generated/prisma/client";
+import { totalmem } from "node:os";
+import { Post, PostStatus } from "../../../generated/prisma/client";
+import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
 const createPost = async (
@@ -15,33 +17,121 @@ const createPost = async (
     return result;
 };
 
-const getAllPost = async (payload: { search: string | undefined }) => {
-    const result = await prisma.post.findMany({
-        where: {
-            OR: [
-                {
-                    title: {
-                        contains: payload.search as string,
-                        mode: "insensitive"
-                    }
-                },
-                {
-                    content: {
-                        contains: payload.search as string,
-                        mode: "insensitive"
-                    }
-                },
+const getAllPost = async ({
+    search,
+    tags,
+    isFeatured,
+    status,
+    authorId,
+    page,
+    limit,
+    skip,
+    sortBy,
+    sortOrder
+}:
+    {
+        search: string | undefined,
+        tags: string[] | [],
+        isFeatured: boolean | undefined,
+        status: PostStatus | undefined,
+        authorId: string | undefined,
+        page: number,
+        limit: number,
+        skip: number,
+        sortBy: string | undefined,
+        sortOrder: string | undefined
+    }) => {
 
-                {
-                    tags: {
-                        has: payload.search as string,
+    const andCondition: PostWhereInput[] = []
+    if (search) {
+        andCondition.push(
+            {
+                OR: [
+
+                    {
+                        title: {
+                            contains: search,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        content: {
+                            contains: search,
+                            mode: "insensitive"
+                        }
+                    },
+
+                    {
+                        tags: {
+                            has: search,
+                        }
                     }
-                }
-            ]
-        }
+                ]
+            },
+        )
+    }
+
+
+    if (tags.length > 0) {
+        andCondition.push({
+            tags: {
+                hasEvery: tags as string[]
+            }
+        })
+    }
+
+    if (typeof isFeatured === "boolean") {
+        andCondition.push({
+            isFeatured
+        })
+    }
+
+
+    if (status) {
+        andCondition.push({
+            status
+        })
+    }
+
+    if (authorId) {
+        andCondition.push({
+            authorId
+        })
+    }
+
+
+
+
+    const allpost = await prisma.post.findMany({
+        take: limit,
+        skip,
+        where: {
+            AND: andCondition
+        },
+
+        orderBy: sortBy && sortOrder ? {
+            [sortBy]: sortOrder
+
+        } : { createAt: "desc" }
+
 
     });
-    return result;
+
+
+    const total = await prisma.post.count({
+        where: {
+            AND: andCondition
+        }
+    })
+    return {
+        data: allpost,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
 };
 
 export const PostService = {
