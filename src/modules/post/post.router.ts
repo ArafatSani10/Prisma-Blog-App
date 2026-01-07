@@ -10,5 +10,11 @@ router.post(
     PostController.createPost
 );
 
-router.get("/", PostController.getAllPost)
+router.get("/",
+    PostController.getAllPost);
+
+router.get("/:postId",
+    PostController.getPostById);
+
+
 export const PostRouter = router;
