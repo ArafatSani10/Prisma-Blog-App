@@ -159,7 +159,7 @@ const getPostById = async (postId: string) => {
 
     return result;
 
-}
+};
 
 export const PostService = {
     createPost,

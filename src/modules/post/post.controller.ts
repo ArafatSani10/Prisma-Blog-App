@@ -84,7 +84,7 @@ const getPostById = async (req: Request, res: Response) => {
             details: err.message || err
         });
     }
-}
+};
 
 export const PostController = {
     createPost,
