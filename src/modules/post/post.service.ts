@@ -115,10 +115,10 @@ const getAllPost = async ({
 
         } : { createAt: "desc" },
 
-        include:{
-            _count:{
-                select:{
-                    comments:true
+        include: {
+            _count: {
+                select: {
+                    comments: true
                 }
             }
         }
