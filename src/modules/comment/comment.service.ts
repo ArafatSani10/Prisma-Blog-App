@@ -4,21 +4,32 @@ const createComment = async (payload: {
     content: string;
     authorId: string;
     postId: string;
-    parentId?: string; // এটা অপশনাল হিসেবে আসছে
+    parentId?: string;
 }) => {
     try {
+        // 1. Post ache ki na check kora
+        await prisma.post.findUniqueOrThrow({
+            where: { id: payload.postId }
+        });
+
+        // 2. Jodi parentId thake (mane reply hoy), tobe parent comment check kora
+        if (payload.parentId) {
+            await prisma.comment.findUniqueOrThrow({
+                where: { id: payload.parentId }
+            });
+        }
+
+        // 3. Comment create kora ebong result-ti variable-e rakha
         const result = await prisma.comment.create({
             data: {
                 content: payload.content,
                 authorId: payload.authorId,
                 postId: payload.postId,
-                // আপনার স্কিমা যেহেতু parentId রিকোয়ার্ড করে, তাই যদি parentId না থাকে 
-                // তবে এটি এরর দিবে। স্কিমা চেঞ্জ না করলে এখানে অন্তত একটি 
-                // আইডি (id) থাকতেই হবে।
-                parentId: payload.parentId as string, 
+                parentId: payload.parentId, // Prisma undefined hole eta ignore korbe
             }
         });
-        return result;
+
+        return result; // Ekhon result pawa jabe
     } catch (error) {
         console.error("Prisma Create Error:", error);
         throw error;
