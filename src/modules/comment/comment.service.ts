@@ -62,25 +62,52 @@ const getCommentById = async (commentId: string) => {
 const getCommentByAuthorId = async (authorId: string) => {
 
     return await prisma.comment.findMany({
-        where:{
+        where: {
             authorId
         },
 
-        orderBy:{createdAt:"desc"},
+        orderBy: { createdAt: "desc" },
 
-        include:{
-            post:{
-                select:{
-                    id:true,
-                    title:true
+        include: {
+            post: {
+                select: {
+                    id: true,
+                    title: true
                 }
             }
         }
     })
+};
+
+const deleteComment = async (commentId: string, authorId: string) => {
+
+    const commentData = await prisma.comment.findFirst({
+        where:{
+            id:commentId,
+            authorId
+        },
+
+        select:{
+            id:true
+        }
+    });
+
+
+    if(!commentData){
+        throw new Error("your provider input is invalid..")
+    }
+
+    const result = await prisma.comment.delete({
+        where:{
+            id:commentData.id
+        }
+    });
+    return result;
 }
 
 export const CommentService = {
     createComment,
     getCommentById,
-    getCommentByAuthorId
+    getCommentByAuthorId,
+    deleteComment
 }

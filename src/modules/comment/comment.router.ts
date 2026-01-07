@@ -17,4 +17,11 @@ router.get(
     CommentController.getCommentByAuthorId)
 
 
+
+router.delete(
+    "/:commentId",
+    auth(UserRole.USER, UserRole.ADMIN),
+    CommentController.deleteComment
+)
+
 export const commentRouter: Router = router;
