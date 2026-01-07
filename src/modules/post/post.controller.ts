@@ -65,10 +65,10 @@ const getAllPost = async (req: Request, res: Response) => {
 
 const getPostById = async (req: Request, res: Response) => {
     try {
-   
-        const {postId} = req.params;
-        console.log({postId})
-        if(!postId){
+
+        const { postId } = req.params;
+        console.log({ postId })
+        if (!postId) {
             throw new Error("Post id is required..")
         }
         const result = await PostService.getPostById(postId);

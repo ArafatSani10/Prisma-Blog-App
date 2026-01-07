@@ -34,8 +34,53 @@ const createComment = async (payload: {
         console.error("Prisma Create Error:", error);
         throw error;
     }
+};
+
+
+const getCommentById = async (commentId: string) => {
+    console.log("Searching for Comment ID:", commentId); // Check korun ID ashole ki ashche
+
+    const result = await prisma.comment.findUnique({
+        where: {
+            id: commentId
+        },
+        include: {
+            post: {
+                select: {
+                    id: true,
+                    title: true,
+                    views: true
+                }
+            }
+        }
+    });
+
+    console.log("Database Result:", result);
+    return result;
+};
+
+const getCommentByAuthorId = async (authorId: string) => {
+
+    return await prisma.comment.findMany({
+        where:{
+            authorId
+        },
+
+        orderBy:{createdAt:"desc"},
+
+        include:{
+            post:{
+                select:{
+                    id:true,
+                    title:true
+                }
+            }
+        }
+    })
 }
 
 export const CommentService = {
-    createComment
+    createComment,
+    getCommentById,
+    getCommentByAuthorId
 }
