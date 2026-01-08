@@ -1,5 +1,6 @@
 import { CommentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+import { commentRouter } from "./comment.router";
 
 const createComment = async (payload: {
     content: string;
@@ -134,6 +135,13 @@ const updateComment = async (
 };
 
 
+const moderateComment = async (id: string, data: { status: CommentStatus }) => {
+    return await prisma.comment.update({
+        where: { id },
+        data
+    });
+};
+
 
 
 export const CommentService = {
@@ -141,7 +149,8 @@ export const CommentService = {
     getCommentById,
     getCommentByAuthorId,
     deleteComment,
-    updateComment
+    updateComment,
+    moderateComment
 };
 
 
