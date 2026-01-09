@@ -6,15 +6,20 @@ const router: Router = express.Router();
 router.post(
     "/",
     auth(UserRole.USER, UserRole.ADMIN),
-    CommentController.createComment);
+    CommentController.createComment
+);
 
 router.get(
     "/:commentId",
-    CommentController.getCommentById);
+    CommentController.getCommentById
+
+
+);
 
 router.get(
     "/author/:authorId",
-    CommentController.getCommentByAuthorId)
+    CommentController.getCommentByAuthorId
+);
 
 
 

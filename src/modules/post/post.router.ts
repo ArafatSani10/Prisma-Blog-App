@@ -6,15 +6,26 @@ const router = express.Router();
 
 router.post(
     "/",
-    auth(UserRole.USER),
+    auth(UserRole.USER, UserRole.ADMIN),
     PostController.createPost
 );
 
 router.get("/",
-    PostController.getAllPost);
+    PostController.getAllPost
+);
+
+
+router.get(
+    "/my-posts",
+    auth(UserRole.USER, UserRole.ADMIN),
+    PostController.getMyPosts
+);
 
 router.get("/:postId",
-    PostController.getPostById);
+    PostController.getPostById
+);
+
+
 
 
 export const PostRouter = router;

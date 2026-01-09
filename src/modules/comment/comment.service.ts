@@ -134,14 +134,27 @@ const updateComment = async (
     });
 };
 
-
 const moderateComment = async (id: string, data: { status: CommentStatus }) => {
+    // 1. Age comment-ti khuje ber koren check korar jonno
+    const existingComment = await prisma.comment.findUnique({
+        where: { id }
+    });
+
+    if (!existingComment) {
+        throw new Error("Comment not found!");
+    }
+
+    // 2. Ekhon check koren status ager thekei same kina
+    if (existingComment.status === data.status) {
+        throw new Error(`Your provided status (${data.status}) is already up to date.`);
+    }
+
+    // 3. Jodi status different hoy, tobe update koren ebong return koren
     return await prisma.comment.update({
         where: { id },
         data
     });
 };
-
 
 
 export const CommentService = {
