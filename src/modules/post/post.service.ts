@@ -251,6 +251,73 @@ const getMyPosts = async (authorId: string) => {
         data: result,
         total
     };
+};
+
+
+
+// aikhane user sudhu tar nijer post update korte parbe but isFeatured update korte parbe na
+// onnodike admin sobar post update korte parbe 
+
+const UpdateMyPosts = async (postId: string, data: Partial<Post>, authorId: string, isAdmin: boolean) => {
+    const postData = await prisma.post.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+
+        select: {
+            id: true,
+            authorId: true
+        }
+    });
+
+
+    if (!isAdmin && (postData.authorId !== authorId)) {
+        throw new Error("you are not the owner/creator of the posts!!");
+    }
+
+
+    if (!isAdmin) {
+        delete data.isFeatured
+    }
+
+    const result = await prisma.post.update({
+        where: {
+            id: postData.id
+        },
+        data
+    });
+
+    return result;
+};
+
+
+// user tarr nijer post delete korte parbe and admin sobar post delete diye dete parbe
+
+
+const deletePost = async (postId: string, authorId: string, isAdmin: boolean) => {
+    const postData = await prisma.post.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+
+        select: {
+            id: true,
+            authorId: true
+        }
+    });
+
+
+    if (!isAdmin && (postData.authorId !== authorId)) {
+        throw new Error("you are not the owner/creator of the posts!!");
+    };
+
+
+    return await prisma.post.delete({
+        where: {
+            id: postId
+        }
+    });
+
 }
 
 
@@ -258,5 +325,7 @@ export const PostService = {
     createPost,
     getAllPost,
     getPostById,
-    getMyPosts
+    getMyPosts,
+    UpdateMyPosts,
+    deletePost
 };

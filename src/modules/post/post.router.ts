@@ -21,9 +21,23 @@ router.get(
     PostController.getMyPosts
 );
 
-router.get("/:postId",
+router.get(
+    "/:postId",
     PostController.getPostById
 );
+
+router.patch(
+    "/:postId",
+    auth(UserRole.USER, UserRole.ADMIN),
+    PostController.UpdateMyPosts
+
+);
+
+router.delete(
+    "/:postId",
+    auth(UserRole.USER, UserRole.ADMIN),
+    PostController.deletePost
+)
 
 
 

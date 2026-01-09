@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { UserRole } from "../../middleware/auth";
 
 const createPost = async (req: Request, res: Response) => {
     try {
@@ -91,7 +92,7 @@ const getMyPosts = async (req: Request, res: Response) => {
     try {
         const user = req.user;
 
-        if(!user){
+        if (!user) {
             throw new Error("you are unauthorized..!!")
         }
 
@@ -111,9 +112,74 @@ const getMyPosts = async (req: Request, res: Response) => {
     }
 };
 
+
+const UpdateMyPosts = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            throw new Error("you are unauthorized..!!")
+        }
+
+        const { postId } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN;
+
+
+        const result = await PostService.UpdateMyPosts(postId as string, req.body, user.id, isAdmin);
+        res.status(200).json(result)
+
+
+    }
+
+    catch (err: any) {
+        return res.status(400).json({
+            success: false,
+            message: "My Post's Update failed!",
+            details: err.message || err
+        });
+    }
+};
+
+
+
+const deletePost = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            throw new Error("you are unauthorized..!!")
+        }
+
+        const { postId } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN;
+
+
+        const result = await PostService.deletePost(postId as string, user.id, isAdmin);
+        res.status(200).json(result)
+
+
+    }
+
+    catch (err: any) {
+        return res.status(400).json({
+            success: false,
+            message: "My Post's delete failed!",
+            details: err.message || err
+        });
+    }
+};
+
+
+
+
+
+
+
 export const PostController = {
     createPost,
     getAllPost,
     getPostById,
-    getMyPosts
+    getMyPosts,
+    UpdateMyPosts,
+    deletePost
 };
