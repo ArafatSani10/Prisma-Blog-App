@@ -24,7 +24,7 @@ function errorHandler(
     else if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2025") {
             statusCode = 400;
-            errorMessage= "An operation failed because it depends on one or more records that were required but not found.!"
+            errorMessage = "An operation failed because it depends on one or more records that were required but not found.!"
         }
 
         else if (err.code === "P2002") {
@@ -41,21 +41,21 @@ function errorHandler(
 
     // PrismaClientUnknownRequestError
 
-    else if (err instanceof Prisma.PrismaClientUnknownRequestError){
-        statusCode=500;
-        errorMessage="Error ocurred during query excustion"
+    else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
+        statusCode = 500;
+        errorMessage = "Error ocurred during query excustion"
     }
 
 
-    else if(err instanceof Prisma.PrismaClientInitializationError){
-        if(err.errorCode === "P1000"){
-            statusCode=401;
-            errorMessage="Authentication failed.please check your credit "
+    else if (err instanceof Prisma.PrismaClientInitializationError) {
+        if (err.errorCode === "P1000") {
+            statusCode = 401;
+            errorMessage = "Authentication failed.please check your credit "
         }
 
-        else if(err.errorCode === "P1001"){
-            statusCode=400;
-            errorMessage="can't reach database server"
+        else if (err.errorCode === "P1001") {
+            statusCode = 400;
+            errorMessage = "can't reach database server"
         }
     }
     res.status(statusCode)
