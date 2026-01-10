@@ -320,26 +320,30 @@ const deletePost = async (postId: string, authorId: string, isAdmin: boolean) =>
 
 };
 
-
 const getStats = async () => {
     return await prisma.$transaction(async (tx) => {
-        const [totalPosts, publishedPost, draftPost, archivedPost, totalComments, approvedComments] = await Promise.all([
+        const [
+
+            totalPosts, publishedPost, draftPost, archivedPost,
+            totalComments, approvedComments, rejectComments,
+            totalUsers, adminCount, userCount,
+            viewsAggregate
+        ] = await Promise.all([
             tx.post.count(),
-            tx.post.count({
-                where: { status: PostStatus.PUBLISHED }
-            }),
-            tx.post.count({
-                where: { status: PostStatus.DRAFT }
-            }),
-            tx.post.count({
-                where: { status: PostStatus.ARCHIVED }
-            }),
+            tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
+            tx.post.count({ where: { status: PostStatus.DRAFT } }),
+            tx.post.count({ where: { status: PostStatus.ARCHIVED } }),
 
             tx.comment.count(),
-            tx.comment.count({
-                where: {
-                    status: CommentStatus.APPROVED
-                }
+            tx.comment.count({ where: { status: CommentStatus.APPROVED } }),
+            tx.comment.count({ where: { status: CommentStatus.REJECT } }),
+
+            tx.user.count(),
+            tx.user.count({ where: { role: "ADMIN" } }),
+            tx.user.count({ where: { role: "USER" } }),
+
+            tx.post.aggregate({
+                _sum: { views: true }
             })
         ]);
 
@@ -349,11 +353,16 @@ const getStats = async () => {
             draftPost,
             archivedPost,
             totalComments,
-            approvedComments
+            approvedComments,
+            rejectComments,
+            totalUsers,
+            adminCount,
+            userCount,
+            // Jodi views null hoy, tobe 0 dekhabe
+            totalViews: viewsAggregate._sum.views || 0
         };
     });
 };
-
 
 
 export const PostService = {
@@ -364,4 +373,6 @@ export const PostService = {
     UpdateMyPosts,
     deletePost,
     getStats
+
+
 };
